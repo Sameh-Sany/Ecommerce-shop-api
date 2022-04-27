@@ -8,7 +8,7 @@ const router = require('express').Router();
 
 //CREATE
 
-router.post('/create', verifyToken, async (req, res) => {
+router.post('/', verifyToken, async (req, res) => {
   const newOrder = new Order(req.body);
   try {
     const savedOrder = await newOrder.save();
@@ -74,11 +74,14 @@ router.get('/income', verifyTokenAndAdmin, async (req, res) => {
   try {
     const income = await Order.aggregate([
       { $match: { createdAt: { $gte: previousMonth } } },
+
       {
         $project: {
           month: { $month: '$createdAt' },
           sales: '$amount',
         },
+      },
+      {
         $group: {
           _id: '$month',
           total: { $sum: '$sales' },
